@@ -9,6 +9,7 @@
 \usepackage{amsmath,amsfonts,mathtools}	% math tools
 \usepackage{fontawesome}	% symbols (this is v4.7)
 \usepackage{tikz,pgf,pgfplots}	% tikz packages, pgf plots package
+\usepackage{ifthen}
 % note that for system without Computer Modern, T1 is bitmap font, so in such case, use package  lmodern
 %===================================================%
 % Metadata settings
@@ -25,11 +26,13 @@
 \usetikzlibrary{arrows.meta, angles, quotes}	% arrowheads
 \usetikzlibrary{intersections}
 \usepgfplotslibrary{fillbetween}	% fill area between curves
-\tikzset{location/.style={anchor=center, inner sep=4pt, font=\Large, draw=black,very thick, minimum width=4em, minimum height=4em,fill=blue!10!white}}
-\tikzset{tripline/.style={rounded corners=10pt,very thick, -{Latex[]}}}
-\tikzset{labelnode/.style={draw=none,font=\large,midway, above, outer sep=3pt}}
-\tikzset{smallabel/.style={draw=none, font=\Large, anchor=north west, outer sep=2pt}}
-\tikzset{graphlbl/.style={red, font=\large, above, sloped,midway}}
+\tikzset{location/.style={anchor=center, inner sep=4pt, font=\Large, draw=black,very thick, minimum width=4em, minimum height=4em,fill=blue!10!white}}%
+\tikzset{tripline/.style={rounded corners=10pt,very thick, -{Latex[]}}}%
+\tikzset{labelnode/.style={draw=none,font=\large,midway, above, outer sep=3pt}}%
+\tikzset{smallabel/.style={draw=none, font=\Large, anchor=north west, outer sep=2pt}}%
+\tikzset{graphlbl/.style={red, font=\large, above, sloped,midway}}%
+\tikzset{dot/.style = {circle, fill, minimum size=#1,inner sep=0pt, outer sep=0pt}}%
+\pgfplotsset{width=0.8\linewidth, height=0.6\linewidth}%
 
 
 %===================================================%
@@ -339,7 +342,6 @@ Under given circumstances of a market zone $A$ (i.e. $\pd, r, d, c_c$ etc.), we 
 
 \tikzset{capacity/.style={domain=0:60, draw=red, thick}}
 	\begin{tikzpicture}
-	\pgfplotsset{width=0.8\linewidth, height=0.6\linewidth}
 	
 	\begin{axis}[samples=50,
 		x label style={at={(axis description cs:0.5,0)}, anchor=north, outer sep=2pt},
@@ -377,31 +379,104 @@ Under given circumstances of a market zone $A$ (i.e. $\pd, r, d, c_c$ etc.), we 
 \subsubsection{Lagrange multiplier optimization}
 For the revenue rate function (see \autoref{eq:revenuerate}) in the following non-throttled form
 \begin{equation}
-	i(m,n)=-\frac{m^2}{c_cd}+\frac{\cd}{c_cd}-s\cdot n \label{eq:revenueratefree}
+	i(m,n)=-\frac{m^2}{c_cd}+\frac{\cd}{c_cd}m-s\cdot n \label{eq:revenueratefree}
 \end{equation}
 under the best scenario of the fleet capacity constraint (see \autoref{eq:mnrelation})
 \begin{equation}
-	g(m,n)=m-\cd+\ccd n=0 \label{eq:lagrangeconst}
+	g(m,n)=m - \max\left(\frac{\cd}{2},\cd-\frac{c_Mc_cd}{\tau}n\right)=0 \label{eq:lagrangeconst}
 \end{equation}
+For the given susceptible population flow, there is a (real approximation of the )threshold fleet size $n_T\in \mathbb{R}$, after such threshold, adding more cars does not increase the revenue rate $i^{+}$ and $\ms=\frac{\cd}{2}$ pricing maximizes the $i^{+}$. It is given as
+\begin{align}
+	\frac{\cd}{2}&=\cd-\ccd n_T \nonumber\\
+	n_T&=\frac{\cd}{2}\frac{\tau}{c_Mc_cd} \label{eq:threshn}
+\end{align}
+We split our calculation into two domains, for $n<n_T$ and $n\geq n_T$. This way, we will have\\
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{p{0.45\textwidth}| p{0.45\textwidth}}
+		$n < n_T$					& $n \geq n_T$ \\
+		$m = \cd - \ccd n$			& $m = \frac{\cd}{2}$ \\
+		$g(m,n)= m - \cd + \ccd n = 0$	& $g(m,n) = m - \frac{\cd}{2} = 0$\\ 
+	\end{tabular}
+	\caption{Two domains for optimization, depending on fleet size saturation $n_T$.}
+	\label{tab:twolagrange}
+\end{table}
+
 So we solve the system
 \begin{align*}
 	\nabla_{m,n} \left[i(m,n)-\lambda g(m,n)\right]&=0\\
 	g(m,n)&=0
 \end{align*}
-where $\lambda$ is a Lagrange multiplier.
+where $\lambda$ is a Lagrange multiplier.\\
 
-Straightforward solution yields
-\begin{align*}
-\lambda&= -s\frac{\tau}{c_Mc_cd}\\
-\ms&=\frac{\cd}{2}+\frac{s\tau}{2c_M}\\
-\ns&=\left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]\frac{\tau}{c_Mc_cd}
-\end{align*}
-where we note, that $\ns\in\mathbb{R}$. To correctly account for the discrete feature of $\ns$, we define two integers
+For the two zones given by \autoref{tab:twolagrange}, we have the following solution
+
+\def\ils{i^\star|_{n<n_T}}
+\def\igs{i^\star|_{n>n_T}}
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{p{0.45\textwidth}| p{0.45\textwidth}}
+		$n < n_T$								& $n \geq n_T$ \\
+		$\lambda= -s\frac{\tau}{c_Mc_cd}$			& $\lambda \text{ is undefined}$ \\
+		$\ms=\frac{\cd}{2}+\frac{s\tau}{2c_M}$		& $\ms= \frac{\cd}{2}$ \\
+		$\ns=\left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]\frac{\tau}{c_Mc_cd}$ & $\ns=n_T=\frac{\cd}{2}\frac{\tau}{c_Mc_cd}$ \\
+		$ \ils=\frac{1}{c_cd} \left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]^2$	&
+		$ \igs=\frac{1}{c_cd}\left[\frac{\cd}{2}\right]\left[\frac{\cd}{2}-\frac{s\tau}{c_M}\right] $
+	\end{tabular}
+	\caption{The optimization shows that there is a local maximum for $i$ if $n<n_T$, and that a local extrema does not exist for $n\geq n_T$, and so it is maximal at the point $\argmax i(m,n)= (\frac{\cd}{2},n_T)$. If we compare the return rates, we see that $\ils>\igs$.}
+	\label{tab:twolagrangesolution}
+\end{table}
+
+where we note, that $\ns\in\mathbb{R}$. And that $\ils>\igs$, specifically $$\ils = \igs + \left[\frac{s\tau}{2c_M}\right]^2.$$  So that, we will consider $$\ns=\left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]\frac{\tau}{c_Mc_cd}<n_T$$ to be the correct real estimate of the optimal integer size of the fleet $\ns_i$.
+
+\begin{figure}[ht]
+\centering
+\pgfplotsset{width=0.95\linewidth, height=0.7\linewidth,compat=1.15}
+	\begin{tikzpicture}
+		\begin{axis}[view={120}{40},
+				domain=0:30, domain y=0:100,
+				zmin=0, zmax=2600, xmin=0, xmax=30, ymin=0, ymax=100,
+				x label style={at={(axis cs: 15, 100 ,0)}, anchor=north west, outer sep=2em},
+				y label style={at={(axis cs: 30, 50, 0)}, anchor=north east, outer sep=2em},
+				z label style={outer sep=2em},
+				ylabel={\large fare $m$}, xlabel={\large cars $n$}, zlabel={\large revenue rate $i$},
+				ticklabel style={font=\large}, zmajorticks=false, %ymajorticks=false,
+				xtick = { 0, 13.8888, 16.6666 }, ytick = {0, 50, 58.3333, 100}, 
+				xticklabels={ 0, {$\ns$}, {$n_T$} }, yticklabels={0, $\frac{\cd}{2}$, $\ms$, $\cd$}
+				]
+
+			\pgfplotsinvokeforeach{1,5,10,15}
+			{\edef\n{#1}
+			\edef\nodename{node#1}
+			\pgfmathsetmacro{\limitA}{50-sqrt(2500-50*\n)}
+			\pgfmathsetmacro{\limitB}{100-3*\n}
+			\pgfmathsetmacro{\slope}{(-9*\n*\n+250*\n)/(100-3*\n-\limitA)}
+			{\edef\temp{\noexpand\addplot3 [thick, red, domain y=\limitA:\limitB] ( {\n}, {y}, {\slope*(y-\limitA)} ) node (\nodename) [dot=6pt,draw=red,pos=1]{};}\temp}
+			}
+		      	\addplot3 [mesh, colormap/viridis, opacity=0.7,restrict z to domain=0:2500]{-(y-50)^2+2500-50*x};
+			\addplot3 [very thick, red, restrict y to domain=50:100,samples=50, shorten >=-0.29ex] ( {x}, {100-3*x}, {-9*x^2+250*x} ) coordinate (ntnode);
+			\addplot3 [very thick, red, restrict x to domain=16.4:30,samples=30] ( {x}, {50}, {2500-50*x} );
+			\addplot3 [only marks, mark size=3pt, draw=red, fill=red] coordinates { (20, 50, 1500)  (25, 50, 1250)  (30, 50, 1000) };
+			\addplot3 [only marks, mark size=5pt, draw=blue, fill=blue] coordinates { (13.88888, 58.33333, 1736.11111) } node (nsnode) [label={[label distance=1em, inner sep=1pt, outer sep=0, draw=none, fill=white,text=blue, font=\large]90:$\ns$}] {};
+			\node[anchor=south, inner sep=1pt, outer sep=0.5em, draw=none, fill=white, text=red, font=\large] at (node10.north) {$\ns_<$};
+			\node[anchor=south east, inner sep=1pt, outer sep=0.5em, draw=none, fill=white, text=red, font=\large] at (node15.north) {$\ns_>$};
+			\draw [dotted, blue, thick] (nsnode) -- (axis cs: 13.88888, 58.33333, 0) coordinate (nsground);
+			\draw [dotted, blue, thick] (axis cs: 13.8888, 100, 0) -- (nsground) -- (axis cs: 30, 58.3333, 0);
+			\draw [dotted, red, thick] (ntnode) -- (axis cs: 16.6666, 50, 0) coordinate (ntground);
+			\draw [dotted, red, thick] (axis cs: 16.6666, 100, 0) -- (ntground) -- (axis cs: 30, 50, 0);
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Illustration of the Lagrange multiplier solution. The mesh illustrates the revenue rate $i$ for the given car pool $n$ and pricing $m$. The red thick curve is the constraint of the optimal pricing given car fleet size---note that after the point $n_T$, there is no reason to increase the fleet size. The highest revenue rate $i^\star$ is marked by the blue dot. The nearest integer values are annotated as $\ns_<$ and $\ns_>$. The straight red lines represent the revenue rate for a fully exploited fleet of a given size, analogical to \autoref{gr:revenue}.}
+	\label{gr:lagrangeproblem}
+\end{figure} 
+
+To correctly account for the discrete feature of $\ns$, we define two integers
 \def\nsd{\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_cd}}
 \begin{equation}
 	n^\star_{<,>} = \left\{\floor*{\nsd}, \ceil*{\nsd}\right\}\label{eq:twons}
 \end{equation}
-where we used \emph{floor} $\floor*{.}$ and \emph{ceil} $\ceil*{.}$ functions respectively. To each of those correspond $\ms_<$ and $\ms_>$ according to \autoref{eq:mnrelation}. The optimal of the two is given by
+where we used \emph{floor} $\floor*{.}$ and \emph{ceil} $\ceil*{.}$ functions respectively. To each of those correspond $\ms_<$ and $\ms_>$ according to \autoref{eq:mscomplete}. The optimal of the two is given by
 \begin{equation*}
 	(\ms,\ns)=\argmax\limits_{\ms\in\{\ms_<,\ms_>\},\ns\in\{\ns_<,\ns_>\}}\left\{i(\ms,\ns)\right\}
 \end{equation*}
