@@ -381,7 +381,7 @@ For the revenue rate function (see \autoref{eq:revenuerate}) in the following no
 \begin{equation}
 	i(m,n)=-\frac{m^2}{c_cd}+\frac{\cd}{c_cd}m-s\cdot n \label{eq:revenueratefree}
 \end{equation}
-under the best scenario of the fleet capacity constraint (see \autoref{eq:mnrelation})
+under the best scenario of the fleet capacity constraint (see \autoref{eq:mscomplete})
 \begin{equation}
 	g(m,n)=m - \max\left(\frac{\cd}{2},\cd-\frac{c_Mc_cd}{\tau}n\right)=0 \label{eq:lagrangeconst}
 \end{equation}
@@ -449,10 +449,11 @@ where we note, that $\ns\in\mathbb{R}$. And that $\ils>\igs$, specifically $$\il
 			\pgfplotsinvokeforeach{1,5,10,15}
 			{\edef\n{#1}
 			\edef\nodename{node#1}
-			\pgfmathsetmacro{\limitA}{50-sqrt(2500-50*\n)}
+%			\pgfmathsetmacro{\limitA}{50-sqrt(2500-50*\n)}
+			\pgfmathsetmacro{\intercept}{50*\n}
 			\pgfmathsetmacro{\limitB}{100-3*\n}
-			\pgfmathsetmacro{\slope}{(-9*\n*\n+250*\n)/(100-3*\n-\limitA)}
-			{\edef\temp{\noexpand\addplot3 [thick, red, domain y=\limitA:\limitB] ( {\n}, {y}, {\slope*(y-\limitA)} ) node (\nodename) [dot=6pt,draw=red,pos=1]{};}\temp}
+			\pgfmathsetmacro{\slope}{(-9*\n*\n+250*\n+\intercept)/(100-3*\n)}
+			{\edef\temp{\noexpand\addplot3 [thick, red, domain y=0:\limitB] ( {\n}, {y}, {\slope*y-\intercept} ) node (\nodename) [dot=6pt,draw=red,pos=1]{};}\temp}
 			}
 		      	\addplot3 [mesh, colormap/viridis, opacity=0.7,restrict z to domain=0:2500]{-(y-50)^2+2500-50*x};
 			\addplot3 [very thick, red, restrict y to domain=50:100,samples=50, shorten >=-0.29ex] ( {x}, {100-3*x}, {-9*x^2+250*x} ) coordinate (ntnode);
@@ -478,15 +479,19 @@ To correctly account for the discrete feature of $\ns$, we define two integers
 \end{equation}
 where we used \emph{floor} $\floor*{.}$ and \emph{ceil} $\ceil*{.}$ functions respectively. To each of those correspond $\ms_<$ and $\ms_>$ according to \autoref{eq:mscomplete}. The optimal of the two is given by
 \begin{equation*}
-	(\ms,\ns)=\argmax\limits_{\ms\in\{\ms_<,\ms_>\},\ns\in\{\ns_<,\ns_>\}}\left\{i(\ms,\ns)\right\}
+	(\ms,\ns)=\argmax\limits_{\substack{\ms\in\{\ms_<,\ms_>\} \\ \ns\in\{\ns_<,\ns_>\}}}\left\{i(\ms,\ns)\right\}
 \end{equation*}
 
 \subsubsection{Finite differences}
-Less formal and more direct way to determine the optima tuple $(\ms,\ns)$ is looking into the changing discrete values of revenue rate $i_k(m^\star_k,n_k)$. We can iterate over the tuples $(\ms_k,n_k)$, increasing $n_{k+1}=n_k+1$, until the point where the revenue keeps increasing, $\Delta i_k=i_k-i_{k-1}>0$. The last increasing index $k$ labels the $\ns=n_k$. The difference form of the \autoref{eq:revenuerate} and \autoref{eq:mnrelation} is
+Less formal and more direct way to determine the optima tuple $(\ms,\ns)$ is looking into the changing discrete values of revenue rate $i_k(m^\star_k,n_k)$. We can iterate over the tuples $(\ms_k,n_k)$, increasing $n_{k+1}=n_k+1$, until the point where the revenue keeps increasing, $\Delta i_k=i_k-i_{k-1}>0$. The last increasing index $k$ labels the $\ns=n_k$. The difference form of the \autoref{eq:revenuerate} and \autoref{eq:mscomplete} is
 \begin{align}
-	\ms_k&=\cd - \ccd n_k \label{eq:diffmnrel}\\
+	\ms_k&=\max\left(\frac{\cd}{2},\cd - \ccd n_k\right) \label{eq:diffmnrel}\\
 	i_k&=-\frac{m_k^2}{c_cd}+\frac{\cd}{c_cd}m_k-sn_k \label{eq:diffincome}
 \end{align}
+with the threshold as in \autoref{eq:threshn}
+\begin{equation*}
+	n_k < \frac{\cd}{2} \frac{\tau}{c_Mc_cd}
+\end{equation*}
 Then, we combine the equations and look for the optimal $\ns$.
 \begin{align*}
 	\Delta i_k	&=-\frac{1}{c_cd}\left[m_k^2-m_{k-1}^2 -\cd m_k +\cd m_{k-1}\right] - s\\
@@ -499,12 +504,29 @@ And now, we search for the $k$, where $i^\star(n_k)$ reaches maximum and begins 
 	2n_k-1&<\left[\frac{\cd c_M}{\tau}-s\right]\left[\frac{\tau}{c_M}\right]^2\frac{1}{c_cd}\\
 	n_k&<\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}+\frac{1}{2}
 \end{align*}
-which means, that the largest $n_k$ meeting the requirement is
+We will see, under what condition the inequality also satisfies \autoref{eq:threshn}
+\begin{align}
+	n_k&<\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}+\frac{1}{2} \leq  \frac{\cd}{2} \frac{\tau}{c_Mc_cd} \nonumber\\
+	\ccd &\leq \frac{s\tau}{c_M} \label{eq:ndiscond} 
+\end{align}
+So if condition given by the \autoref{eq:ndiscond} is met, then the largest $n_k$ meeting the requirement is
 \begin{align}
 	\ns&=\floor*{\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}+\frac{1}{2}}\nonumber\\
 	\ns&=\nint*{\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}}\label{eq:roundn}
 \end{align}
-which is basically equivalent to the \autoref{eq:twons}. The notation $\nint*{.}$ of \autoref{eq:roundn} means selecting the nearest integer. $\ms$ is easily computed from $\ns$ using \autoref{eq:diffmnrel}.
+which is basically equivalent to the \autoref{eq:twons}. The notation $\nint*{.}$ of \autoref{eq:roundn} means selecting the nearest integer. $\ms$ is easily computed from $\ns$ using \autoref{eq:diffmnrel}. We will denote such coordinates of maximum return rate $i^\star(\ms, \ns)$, meeting the condition of \autoref{eq:ndiscond}, as a tuple $(\ms_\text{loc},\ns_\text{loc})$.
+
+If \autoref{eq:ndiscond} is not met, there is a possibility, under a certain configuration of parameters, that $\ns \geq n_T$. Then, the maximum $i^\star$ would be realized for the first integer higher than $n_T$ (see \autoref{gr:lagrangeproblem}), 
+\begin{equation}
+	\ns=\ceil*{n_T}=\ceil*{\frac{\cd}{2} \frac{\tau}{c_Mc_cd}}.	\label{eq:floornt}
+\end{equation}
+We will denote such maximum coordinates $\ns_T$ and $\ms_T$.
+
+In general, if \autoref{eq:ndiscond} is not met, the optimal car fleet is given as
+\begin{equation}
+	(\ms,\ns)=\argmax\limits_{\substack{\ns\in\{\ns_T, \ns_\text{loc}\} \\ {\ms\in\{\ms_T, \ms_\text{loc}\}}}} \{i(\ms,\ns)\} \label{eq:generaln}
+\end{equation}
+and the corresponding $\ms$ by  \autoref{eq:diffmnrel}. So, \autoref{eq:ndiscond} gives us a sufficient condition for $(\ns,\ms)$ to be given by \autoref{eq:roundn} and \autoref{eq:diffmnrel}. If this condition doesn't hold, we must verify, using the \autoref{eq:generaln}.
 
 \section{Conclusion}
 Only the very basic model was presented, which describes one particular feeding corridor during peak time window, when most of the descriptors can be approximated as time-independent. The peak time is also the time of most intensive movement, and so the most interesting part of the day. The model is deterministic and simplistic. Simple models give us initial analytical insight into more complex versions of those problems.
