@@ -9,7 +9,7 @@
 \usepackage{amsmath,amsfonts,mathtools}	% math tools
 \usepackage{fontawesome}	% symbols (this is v4.7)
 \usepackage{tikz,pgf,pgfplots}	% tikz packages, pgf plots package
-\usepackage{ifthen}
+\usepackage{caption}
 % note that for system without Computer Modern, T1 is bitmap font, so in such case, use package  lmodern
 %===================================================%
 % Metadata settings
@@ -309,9 +309,10 @@ The analysis of the break-even points is meaningful for adaptive pricing. It sho
 \def\ns{n^\star}
 \def\ccd{\frac{c_Mc_cd}{\tau}}
 \subsection{Maximal return rate}
+\label{ss:maxretrate}
 The last aspect of the model is maximizing the return rate $i(m,n)$. In the following sections, we assume a situation with no planned loss, as demanded by \autoref{eq:feasiblerate}, i.e. fully exploited car covers its operation costs. In the following, we will also assume a fixed susceptible population flow $\pd$, which means a fixed cost function $\cd$ (\autoref{eq:costfunction}). %
 
-We formally analyze the return rate maximum ($i^\star$) without capacity constrains, we consider parameter $n$ chosen (and fixed) in such way, that $q(m)\leq a(n), \forall m$, that is, the capacity of the fleet of $n$ cars can serve all the potential customers. This is represented in \autoref{gr:ridepricegraph} by the parabola being smaller than the line for all relevant $m$. Now, we want to maximize the collected fare $i^+$ (operation costs $i^-(n)$ are given and fixed by the choice of $n$) by selecting the maximizing $\ms$\footnote{We use the star symbol $\star$ to denote the parameter value, which was chosen and fixed to optimize for maximum return rate.}.
+We formally analyze the return rate maximum ($i^\star$) without capacity constrains, we consider parameter $n$ chosen (and fixed) in such way, that $q(m)\leq a(n), \forall m$, that is, the capacity of the fleet of $n$ cars can serve all the potential customers. This is represented in \autoref{gr:ridepricegraph} by the parabola being smaller than the line for all relevant $m$. Now, we want to maximize the collected fare $i^+$ (operation costs $i^-(n)$ are given and fixed by the choice of $n$) by selecting the maximizing $\ms$\protect\footnote{We use the star symbol $\star$ to denote the parameter value, which was chosen and fixed to optimize for maximum return rate.}.
 In absence of a capacity constraint, $\ms$ maximizes the return rates for a given $\pd$ and $n$.
 \begin{align}
 	m\overbrace{\left[\pd - \frac{m}{c_cd}+\frac{c_s}{c_cd}(d+r)\right]}^{=q\leq a}&=i^{+}\nonumber\\
@@ -371,68 +372,49 @@ Under given circumstances of a market zone $A$ (i.e. $\pd, r, d, c_c$ etc.), we 
 		
 	\end{axis}
 	\end{tikzpicture}
-	\caption{The parabola represents the collected revenue rate curve for a given fare without any constraint of deployed fleet capacity. The lines labeled $n_i$ represent the revenue rates upper limits given by the fleet capacity $a(n_i)$. Points labeled \msn{i} label the optimal fare for the given fleet size $n_i$, i.e. $\ms_i=\argmax\limits_{m\in(\frac{\cd}{2},\cd); n=n_i} \{\min(a(n_i),q(m))\}$.}
+	\caption[revenue rate parabola]{The parabola represents the collected revenue rate curve for a given fare without any constraint of deployed fleet capacity. The lines labeled $n_i$ represent the revenue rates upper limits given by the fleet capacity $a(n_i)$. Points labeled \msn{i} label the optimal fare for the given fleet size $n_i$, i.e. \ensuremath{\ms_i=\argmax\limits_{\substack{ m\in(\frac{\cd}{2},\cd) \\ {n=n_i} } } \{\min(a(n_i),q(m))\}}. Note that the \msn{i} are equidistant.}
 	\label{gr:revenue}
 \end{figure}
 
 \newpage
 \subsubsection{Lagrange multiplier optimization}
-For the revenue rate function (see \autoref{eq:revenuerate}) in the following non-throttled form
+We will find the optimal choice of pricing $\ms$ and fleet size $\ns$ for the revenue rate function (see \autoref{eq:revenuerate}) in the following non-throttled form (represented by the mesh in \autoref{gr:lagrangeproblem})
 \begin{equation}
 	i(m,n)=-\frac{m^2}{c_cd}+\frac{\cd}{c_cd}m-s\cdot n \label{eq:revenueratefree}
 \end{equation}
-under the best scenario of the fleet capacity constraint (see \autoref{eq:mscomplete})
+under the the fleet capacity constraint with optimal pricing (see $m-n$ relation in \autoref{eq:mscomplete}, represented by the red constraining solid line in \autoref{gr:lagrangeproblem})
 \begin{equation}
 	g(m,n)=m - \max\left(\frac{\cd}{2},\cd-\frac{c_Mc_cd}{\tau}n\right)=0 \label{eq:lagrangeconst}
 \end{equation}
-For the given susceptible population flow, there is a (real approximation of the )threshold fleet size $n_T\in \mathbb{R}$, after such threshold, adding more cars does not increase the revenue rate $i^{+}$ and $\ms=\frac{\cd}{2}$ pricing maximizes the $i^{+}$. It is given as
+For a given susceptible population flow $\pd$, there is a (real approximation of the) threshold fleet size $n_T\in \mathbb{R}$ (see \autoref{gr:lagrangeproblem}). After such threshold, adding more cars $n_k>n_T$ does not increase the maximal return rate, $\max(i(n_k)) < \max(i(n_T))$, and the pricing $\ms=\frac{\cd}{2}$ maximizes the revenue rate, $\argmax\limits_{m} i(m,n_k)=\frac{\cd}{2}$. The threshold is given as
 \begin{align}
 	\frac{\cd}{2}&=\cd-\ccd n_T \nonumber\\
 	n_T&=\frac{\cd}{2}\frac{\tau}{c_Mc_cd} \label{eq:threshn}
 \end{align}
-We split our calculation into two domains, for $n<n_T$ and $n\geq n_T$. This way, we will have\\
 
-\begin{table}[ht]
+\begin{table}[h!]
 	\centering
 	\begin{tabular}{p{0.45\textwidth}| p{0.45\textwidth}}
 		$n < n_T$					& $n \geq n_T$ \\
 		$m = \cd - \ccd n$			& $m = \frac{\cd}{2}$ \\
 		$g(m,n)= m - \cd + \ccd n = 0$	& $g(m,n) = m - \frac{\cd}{2} = 0$\\ 
 	\end{tabular}
-	\caption{Two domains for optimization, depending on fleet size saturation $n_T$.}
+	\caption{Two domains for optimization, depending on fleet size threshold $n_T$.}
 	\label{tab:twolagrange}
 \end{table}
 
-So we solve the system
+We split our calculation into two domains, for $n<n_T$ and $n\geq n_T$ as sketched in \autoref{tab:twolagrange}.
+
+For each of the two domains in \autoref{tab:twolagrange}, we solve the system
 \begin{align*}
 	\nabla_{m,n} \left[i(m,n)-\lambda g(m,n)\right]&=0\\
 	g(m,n)&=0
 \end{align*}
-where $\lambda$ is a Lagrange multiplier.\\
+applying the technique of Lagrange multipliers, where $\lambda$ is a Lagrange multiplier.
 
-For the two zones given by \autoref{tab:twolagrange}, we have the following solution
-
-\def\ils{i^\star|_{n<n_T}}
-\def\igs{i^\star|_{n>n_T}}
-\begin{table}[h!]
-	\centering
-	\begin{tabular}{p{0.45\textwidth}| p{0.45\textwidth}}
-		$n < n_T$								& $n \geq n_T$ \\
-		$\lambda= -s\frac{\tau}{c_Mc_cd}$			& $\lambda \text{ is undefined}$ \\
-		$\ms=\frac{\cd}{2}+\frac{s\tau}{2c_M}$		& $\ms= \frac{\cd}{2}$ \\
-		$\ns=\left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]\frac{\tau}{c_Mc_cd}$ & $\ns=n_T=\frac{\cd}{2}\frac{\tau}{c_Mc_cd}$ \\
-		$ \ils=\frac{1}{c_cd} \left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]^2$	&
-		$ \igs=\frac{1}{c_cd}\left[\frac{\cd}{2}\right]\left[\frac{\cd}{2}-\frac{s\tau}{c_M}\right] $
-	\end{tabular}
-	\caption{The optimization shows that there is a local maximum for $i$ if $n<n_T$, and that a local extrema does not exist for $n\geq n_T$, and so it is maximal at the point $\argmax i(m,n)= (\frac{\cd}{2},n_T)$. If we compare the return rates, we see that $\ils>\igs$.}
-	\label{tab:twolagrangesolution}
-\end{table}
-
-where we note, that $\ns\in\mathbb{R}$. And that $\ils>\igs$, specifically $$\ils = \igs + \left[\frac{s\tau}{2c_M}\right]^2.$$  So that, we will consider $$\ns=\left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]\frac{\tau}{c_Mc_cd}<n_T$$ to be the correct real estimate of the optimal integer size of the fleet $\ns_i$.
-
-\begin{figure}[ht]
+\begin{figure}[ht!]
 \centering
-\pgfplotsset{width=0.95\linewidth, height=0.7\linewidth,compat=1.15}
+\pgfplotsset{width=0.95\linewidth, height=0.7\linewidth, compat=1.15}
 	\begin{tikzpicture}
 		\begin{axis}[view={120}{40},
 				domain=0:30, domain y=0:100,
@@ -453,7 +435,7 @@ where we note, that $\ns\in\mathbb{R}$. And that $\ils>\igs$, specifically $$\il
 			\pgfmathsetmacro{\intercept}{50*\n}
 			\pgfmathsetmacro{\limitB}{100-3*\n}
 			\pgfmathsetmacro{\slope}{(-9*\n*\n+250*\n+\intercept)/(100-3*\n)}
-			{\edef\temp{\noexpand\addplot3 [thick, red, domain y=0:\limitB] ( {\n}, {y}, {\slope*y-\intercept} ) node (\nodename) [dot=6pt,draw=red,pos=1]{};}\temp}
+			{\edef\temp{\noexpand\addplot3 [thick, dashed, red, domain y=0:\limitB] ( {\n}, {y}, {\slope*y-\intercept} ) node (\nodename) [dot=6pt,draw=red,pos=1]{};}\temp}
 			}
 		      	\addplot3 [mesh, colormap/viridis, opacity=0.7,restrict z to domain=0:2500]{-(y-50)^2+2500-50*x};
 			\addplot3 [very thick, red, restrict y to domain=50:100,samples=50, shorten >=-0.29ex] ( {x}, {100-3*x}, {-9*x^2+250*x} ) coordinate (ntnode);
@@ -468,9 +450,29 @@ where we note, that $\ns\in\mathbb{R}$. And that $\ils>\igs$, specifically $$\il
 			\draw [dotted, red, thick] (axis cs: 16.6666, 100, 0) -- (ntground) -- (axis cs: 30, 50, 0);
 		\end{axis}
 	\end{tikzpicture}
-	\caption{Illustration of the Lagrange multiplier solution. The mesh illustrates the revenue rate $i$ for the given car pool $n$ and pricing $m$. The red thick curve is the constraint of the optimal pricing given car fleet size---note that after the point $n_T$, there is no reason to increase the fleet size. The highest revenue rate $i^\star$ is marked by the blue dot. The nearest integer values are annotated as $\ns_<$ and $\ns_>$. The straight red lines represent the revenue rate for a fully exploited fleet of a given size, analogical to \autoref{gr:revenue}.}
+	\caption{Illustration of the Lagrange multiplier solution. The mesh illustrates the revenue rate $i$ for the given car pool $n$ and pricing $m$. The red thick curve is the constraint of the optimal pricing given car fleet size---note that after the point $n_T$, there is no reason to increase the fleet size. The highest revenue rate $i^\star$ is marked by the blue dot. The nearest integer values are annotated as $\ns_<$ and $\ns_>$. The straight red dashed lines represent the revenue rate for a fully exploited fleet of a given size, analogical to \autoref{gr:revenue}.}
 	\label{gr:lagrangeproblem}
 \end{figure} 
+
+We have the following solution
+
+\def\ils{i^\star|_{n<n_T}}
+\def\igs{i^\star|_{n>n_T}}
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{p{0.45\textwidth}| p{0.45\textwidth}}
+		$n < n_T$								& $n \geq n_T$ \\
+		$\lambda= -s\frac{\tau}{c_Mc_cd}$			& $\lambda \text{ is undefined}$ \\
+		$\ms=\frac{\cd}{2}+\frac{s\tau}{2c_M}$		& $\ms= \frac{\cd}{2}$ \\
+		$\ns=\left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]\frac{\tau}{c_Mc_cd}$ & $\ns=n_T=\frac{\cd}{2}\frac{\tau}{c_Mc_cd}$ \\
+		$ \ils=\frac{1}{c_cd} \left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]^2$	&
+		$ \igs=\frac{1}{c_cd}\left[\frac{\cd}{2}\right]\left[\frac{\cd}{2}-\frac{s\tau}{c_M}\right] $
+	\end{tabular}
+	\caption{The optimization shows that there is a local maximum for $i$ if $n<n_T$, and that a local extrema does not exist for $n\geq n_T$, and so it is maximal at the point $\argmax\limits_{(m,n)} i(m,n)= (\frac{\cd}{2},n_T)$. If we compare the return rates, we see that $\ils>\igs$.}
+	\label{tab:twolagrangesolution}
+\end{table}
+
+where we note, that $\ns\in\mathbb{R}$. And that $\ils>\igs$, specifically $$\ils = \igs + \left[\frac{s\tau}{2c_M}\right]^2.$$  We will therefore consider $$\ns=\left[\frac{\cd}{2}-\frac{s\tau}{2c_M}\right]\frac{\tau}{c_Mc_cd}<n_T$$ to be the correct global real estimate of the optimal integer size of the fleet $\ns_i$.
 
 To correctly account for the discrete feature of $\ns$, we define two integers
 \def\nsd{\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_cd}}
@@ -478,12 +480,12 @@ To correctly account for the discrete feature of $\ns$, we define two integers
 	n^\star_{<,>} = \left\{\floor*{\nsd}, \ceil*{\nsd}\right\}\label{eq:twons}
 \end{equation}
 where we used \emph{floor} $\floor*{.}$ and \emph{ceil} $\ceil*{.}$ functions respectively. To each of those correspond $\ms_<$ and $\ms_>$ according to \autoref{eq:mscomplete}. The optimal of the two is given by
-\begin{equation*}
-	(\ms,\ns)=\argmax\limits_{\substack{\ms\in\{\ms_<,\ms_>\} \\ \ns\in\{\ns_<,\ns_>\}}}\left\{i(\ms,\ns)\right\}
-\end{equation*}
+\begin{equation}
+	(\ms,\ns)=\argmax\limits_{\substack{m\in\{\ms_<,\ms_>\} \\ n\in\{\ns_<,\ns_>\}}}\left\{i(m,n)\right\} \label{eq:argmaxlagrange}
+\end{equation}
 
 \subsubsection{Finite differences}
-Less formal and more direct way to determine the optima tuple $(\ms,\ns)$ is looking into the changing discrete values of revenue rate $i_k(m^\star_k,n_k)$. We can iterate over the tuples $(\ms_k,n_k)$, increasing $n_{k+1}=n_k+1$, until the point where the revenue keeps increasing, $\Delta i_k=i_k-i_{k-1}>0$. The last increasing index $k$ labels the $\ns=n_k$. The difference form of the \autoref{eq:revenuerate} and \autoref{eq:mscomplete} is
+Less formal and more direct way to determine the optimal tuple $(\ms,\ns)$ is looking into the changing discrete values of revenue rate $i_k(m^\star_k,n_k)$. In this approach, we assume that there is one local maximum which is also the global maximum $i^\star$, and that the series of $i_k$ monotonically increases with $k$ (and so $n_k$) towards the maximum and then decreases. In such situation, we can iterate over the tuples $(\ms_k,n_k)$, increasing $n_{k+1}=n_k+1$, until the point where the revenue keeps increasing, $\Delta i_k=i_k-i_{k-1}>0$. The last (highest) index $n_k$ labels the $\ns=n_k$. The difference form of the \autoref{eq:revenuerate} and \autoref{eq:mscomplete} is
 \begin{align}
 	\ms_k&=\max\left(\frac{\cd}{2},\cd - \ccd n_k\right) \label{eq:diffmnrel}\\
 	i_k&=-\frac{m_k^2}{c_cd}+\frac{\cd}{c_cd}m_k-sn_k \label{eq:diffincome}
@@ -492,51 +494,49 @@ with the threshold as in \autoref{eq:threshn}
 \begin{equation*}
 	n_k < \frac{\cd}{2} \frac{\tau}{c_Mc_cd}
 \end{equation*}
-Then, we combine the equations and look for the optimal $\ns$.
+Then, we combine the equations and look for the optimal $\ns$. The difference in revenue from $n_{k-1}$ to $n_k$ is given as
 \begin{align*}
 	\Delta i_k	&=-\frac{1}{c_cd}\left[m_k^2-m_{k-1}^2 -\cd m_k +\cd m_{k-1}\right] - s\\
 			&=-\frac{1}{c_cd}(m_k^2-m_{k-1}^2)-\frac{\cd c_M}{\tau}-s\\
 			&=-c_cd\left(\frac{c_M}{\tau}\right)^2(2n_k-1)+\frac{\cd c_M}{\tau}-s
 \end{align*}
-And now, we search for the $k$, where $i^\star(n_k)$ reaches maximum and begins to decline, i.e.
-\begin{align*}
-	0&<-c_cd\left(\frac{c_M}{\tau}\right)^2(2n_k-1)+\frac{\cd c_M}{\tau}-s\\
-	2n_k-1&<\left[\frac{\cd c_M}{\tau}-s\right]\left[\frac{\tau}{c_M}\right]^2\frac{1}{c_cd}\\
-	n_k&<\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}+\frac{1}{2}
-\end{align*}
-We will see, under what condition the inequality also satisfies \autoref{eq:threshn}
+And now, we search for the $k$, where $i^\star(n_k)$ reaches maximum and begins to decline, i.e. the last increase, the highest $n_k$ with $\Delta i_k>0$.
+\begin{align}
+	0&<-c_cd\left(\frac{c_M}{\tau}\right)^2(2n_k-1)+\frac{\cd c_M}{\tau}-s \nonumber\\
+	2n_k-1&<\left[\frac{\cd c_M}{\tau}-s\right]\left[\frac{\tau}{c_M}\right]^2\frac{1}{c_cd} \nonumber\\
+	n_k&<\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}+\frac{1}{2} \label{eq:maxnk}
+\end{align}
+The threshold inequality \autoref{eq:threshn} is automatically satisfied for \label{eq:maxnk} if
 \begin{align}
 	n_k&<\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}+\frac{1}{2} \leq  \frac{\cd}{2} \frac{\tau}{c_Mc_cd} \nonumber\\
 	\ccd &\leq \frac{s\tau}{c_M} \label{eq:ndiscond} 
 \end{align}
-So if condition given by the \autoref{eq:ndiscond} is met, then the largest $n_k$ meeting the requirement is
+The condition \autoref{eq:ndiscond} (which is a stronger condition than \autoref{eq:threshn}) is independent on $n_k$. So if the condition \autoref{eq:ndiscond} holds, it is a sufficient condition which guarantees, that the largest integer $n_k$ meeting the requirement \autoref{eq:maxnk} is really the global maximum $\ns$, i.e.
 \begin{align}
 	\ns&=\floor*{\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}+\frac{1}{2}}\nonumber\\
 	\ns&=\nint*{\left(\frac{\cd}{2}-\frac{s\tau}{2c_M}\right)\frac{\tau}{c_Mc_c d}}\label{eq:roundn}
 \end{align}
-which is basically equivalent to the \autoref{eq:twons}. The notation $\nint*{.}$ of \autoref{eq:roundn} means selecting the nearest integer. $\ms$ is easily computed from $\ns$ using \autoref{eq:diffmnrel}. We will denote such coordinates of maximum return rate $i^\star(\ms, \ns)$, meeting the condition of \autoref{eq:ndiscond}, as a tuple $(\ms_\text{loc},\ns_\text{loc})$.
+which is basically equivalent to the \autoref{eq:twons}. The notation $\nint*{.}$ of \autoref{eq:roundn} means selecting the nearest integer. $\ms$ is easily computed from $\ns$ using \autoref{eq:diffmnrel}. We will denote such coordinates of maximum return rate $i^\star(\ms, \ns)$, meeting the condition of \autoref{eq:ndiscond}, as a tuple $(\ms_\text{loc},\ns_\text{loc})$.%
 
 If \autoref{eq:ndiscond} is not met, there is a possibility, under a certain configuration of parameters, that $\ns \geq n_T$. Then, the maximum $i^\star$ would be realized for the first integer higher than $n_T$ (see \autoref{gr:lagrangeproblem}), 
 \begin{equation}
 	\ns=\ceil*{n_T}=\ceil*{\frac{\cd}{2} \frac{\tau}{c_Mc_cd}}.	\label{eq:floornt}
 \end{equation}
-We will denote such maximum coordinates $\ns_T$ and $\ms_T$.
+We will denote such maximum coordinates $\ns_T$ and $\ms_T$, related by \autoref{eq:diffmnrel}.
 
 In general, if \autoref{eq:ndiscond} is not met, the optimal car fleet is given as
 \begin{equation}
-	(\ms,\ns)=\argmax\limits_{\substack{\ns\in\{\ns_T, \ns_\text{loc}\} \\ {\ms\in\{\ms_T, \ms_\text{loc}\}}}} \{i(\ms,\ns)\} \label{eq:generaln}
+	(\ms,\ns)=\argmax\limits_{\substack{n\in\{\ns_T, \ns_\text{loc}\} \\ {m\in\{\ms_T, \ms_\text{loc}\}}}} \{i(m,n)\} \label{eq:generaln}
 \end{equation}
-and the corresponding $\ms$ by  \autoref{eq:diffmnrel}. So, \autoref{eq:ndiscond} gives us a sufficient condition for $(\ns,\ms)$ to be given by \autoref{eq:roundn} and \autoref{eq:diffmnrel}. If this condition doesn't hold, we must verify, using the \autoref{eq:generaln}.
+similarly to the \autoref{eq:argmaxlagrange}. So, \autoref{eq:ndiscond} gives us a sufficient condition for $(\ms,\ns)$ to be given by \autoref{eq:roundn} and \autoref{eq:diffmnrel}. If this condition doesn't hold, we must verify, using the \autoref{eq:generaln}.
 
 \section{Conclusion}
 Only the very basic model was presented, which describes one particular feeding corridor during peak time window, when most of the descriptors can be approximated as time-independent. The peak time is also the time of most intensive movement, and so the most interesting part of the day. The model is deterministic and simplistic. Simple models give us initial analytical insight into more complex versions of those problems.
 
-We have shown that the transport system described by a short list of quasi-static parameters (see \autoref{tab:descriptors}) and their simple inter-relation  can serve as a basic model of a feeding corridor, considering its demographic factors (both intensive preferences of the agents like $c_s$, $c_c$, and extensive intrinsic area values like $p_A$, $d$), geometric factors ($\tau$, $r$), business parameters ($n$, $s$, $m$, $c_M$). These results allow to compare the performance over various locations in a pre-election process.
+We have shown that the transport system described by a short list of quasi-static parameters (see \autoref{tab:descriptors}) and their simple inter-relation  can serve as a basic model of a feeding corridor, considering its demographic factors (both intensive preferences of the agents like $c_s$, $c_c$, and extensive intrinsic area values like $p_A$, $d$), geometric factors ($\tau$, $r$), business parameters ($n$, $s$, $m$, $c_M$). These results allow to compare the performance over various locations in a pre-election process. Most of the parameters from \autoref{tab:descriptors} can be realistically estimated using freely available data. The intensive parameters, particularly $c_c$ are more difficult to grasp. 
 
 Analysis of the model allowed us to estimate the optimal values and ranges for business parameters, assuming some of the parameters are fixed, i.e. $\pd$, $\cd$. Thus getting estimates for $\md_{<,>}$ and optimal fare $\ms$, and the necessary corresponding size of the fleet $n^{\star}$. While at the same time, it gave us more general feasibility limits on fares, driver pay, fleet size, etc.
 
-Most of the parameters from \autoref{tab:descriptors} can be realistically estimated using freely available data. The intensive parameters, particularly $c_c$ are more difficult to grasp.
-
-
+As we can see from the \autoref{ss:maxretrate}, the parameters of the optimal return rate $i^\star$, $(\ms,\ns)$, depend on an interplay of many factors. Our model predicts a single global optimal tuple for a given set of system parameters. Such optimum can be easily located using explicit equations from \autoref{tab:twolagrangesolution} or using nearly identical \autoref{eq:roundn}. However, in some situations of particular system parameters (as mandated by \autoref{eq:ndiscond}) or accounting for the discrete character of $n$ (as treated in \autoref{eq:twons}), we may need to double check the optimum comparing returns at integer values, or at values close to the fleet size threshold point $n_T$ (given by \autoref{eq:threshn}), using \autoref{eq:argmaxlagrange} and \autoref{eq:generaln}.
 
 \end{document}
